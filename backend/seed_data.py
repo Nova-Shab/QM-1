@@ -25,49 +25,49 @@ from app.models.template import Template
 # Test users
 USERS = [
     {
-        "email": "admin@pharma-dms.local",
+        "email": "admin@pharma-dms.de",
         "name": "System Administrator",
         "password": "admin123",
         "role": UserRole.ADMIN,
         "department": "IT"
     },
     {
-        "email": "author@pharma-dms.local",
+        "email": "author@pharma-dms.de",
         "name": "Dr. Maria Schmidt",
         "password": "author123",
         "role": UserRole.AUTHOR,
         "department": "Production"
     },
     {
-        "email": "qa.reviewer@pharma-dms.local",
+        "email": "qa.reviewer@pharma-dms.de",
         "name": "Thomas Müller",
         "password": "reviewer123",
         "role": UserRole.QA_REVIEWER,
         "department": "QA"
     },
     {
-        "email": "qa.approver@pharma-dms.local",
+        "email": "qa.approver@pharma-dms.de",
         "name": "Dr. Anna Weber",
         "password": "approver123",
         "role": UserRole.QA_APPROVER,
         "department": "QA"
     },
     {
-        "email": "qp@pharma-dms.local",
+        "email": "qp@pharma-dms.de",
         "name": "Prof. Dr. Hans Fischer",
         "password": "qp123",
         "role": UserRole.QP,
         "department": "QA"
     },
     {
-        "email": "ra@pharma-dms.local",
+        "email": "ra@pharma-dms.de",
         "name": "Lisa Braun",
         "password": "ra123",
         "role": UserRole.RA,
         "department": "Regulatory Affairs"
     },
     {
-        "email": "production@pharma-dms.local",
+        "email": "production@pharma-dms.de",
         "name": "Klaus Wagner",
         "password": "prod123",
         "role": UserRole.PRODUCTION,
