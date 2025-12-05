@@ -29,21 +29,19 @@ const api = axios.create({
 // Add auth token to requests
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
+  console.log('API Request:', config.url, 'Token exists:', !!token);
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
 
-// Handle auth errors
+// Handle auth errors - don't auto-redirect, let components handle it
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
-    }
+    // Log the error for debugging
+    console.error('API Error:', error.response?.status, error.config?.url);
     return Promise.reject(error);
   }
 );
