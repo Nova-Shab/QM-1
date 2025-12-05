@@ -49,15 +49,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('user');
   };
 
-  // Role-based permissions
-  const reviewerRoles = ['admin', 'qa_reviewer', 'qa_approver', 'qp'];
-  const approverRoles = ['admin', 'qa_approver', 'qp'];
-  const editorRoles = ['admin', 'author', 'qa_reviewer', 'qa_approver', 'qp', 'ra', 'production'];
+  // Role-based permissions (roles are uppercase in database)
+  const reviewerRoles = ['ADMIN', 'QA_REVIEWER', 'QA_APPROVER', 'QP'];
+  const approverRoles = ['ADMIN', 'QA_APPROVER', 'QP'];
+  const editorRoles = ['ADMIN', 'AUTHOR', 'QA_REVIEWER', 'QA_APPROVER', 'QP', 'RA', 'PRODUCTION'];
 
-  const canReview = user ? reviewerRoles.includes(user.role) : false;
-  const canApprove = user ? approverRoles.includes(user.role) : false;
-  const canEdit = user ? editorRoles.includes(user.role) : false;
-  const isAdmin = user?.role === 'admin';
+  const userRole = user?.role?.toUpperCase() || '';
+  const canReview = reviewerRoles.includes(userRole);
+  const canApprove = approverRoles.includes(userRole);
+  const canEdit = editorRoles.includes(userRole);
+  const isAdmin = userRole === 'ADMIN';
 
   return (
     <AuthContext.Provider
