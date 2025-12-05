@@ -67,9 +67,9 @@ export default function LoginPage() {
 
         <div style={{ marginTop: '24px', fontSize: '12px', color: '#6b7280', textAlign: 'center' }}>
           <p><strong>Test Accounts:</strong></p>
-          <p>admin@pharma-dms.local / admin123</p>
-          <p>author@pharma-dms.local / author123</p>
-          <p>qa.approver@pharma-dms.local / approver123</p>
+          <p>admin@pharma-dms.de / admin123</p>
+          <p>author@pharma-dms.de / author123</p>
+          <p>qa.approver@pharma-dms.de / approver123</p>
         </div>
       </div>
     </div>
