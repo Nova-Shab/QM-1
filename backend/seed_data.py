@@ -779,7 +779,7 @@ async def seed_database():
                 owner_id=author_id,
                 status=doc_data["status"],
                 effective_date=datetime.now() if doc_data["status"] == DocumentStatus.EFFECTIVE else None,
-                review_date=datetime.now() + timedelta(days=730) if doc_data["status"] == DocumentStatus.EFFECTIVE else None,
+                next_review_date=datetime.now() + timedelta(days=730) if doc_data["status"] == DocumentStatus.EFFECTIVE else None,
             )
             session.add(doc)
             await session.flush()
