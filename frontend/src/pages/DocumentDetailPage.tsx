@@ -187,6 +187,13 @@ export default function DocumentDetailPage() {
         </div>
 
         <div className="document-actions">
+          <button
+            onClick={() => window.open(`/api/v1/documents/${document.id}/export/pdf`, '_blank')}
+            className="btn btn-outline"
+            title="Als PDF herunterladen"
+          >
+            PDF Export
+          </button>
           {canSubmitForReview && (
             <button onClick={handleSubmitForReview} className="btn btn-primary">
               Submit for Review

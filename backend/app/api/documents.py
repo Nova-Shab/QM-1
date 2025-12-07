@@ -1,9 +1,11 @@
 """
 Document API endpoints.
 """
+import json
 from typing import List, Optional
 from datetime import date
 from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, or_, func
 from sqlalchemy.orm import selectinload
@@ -28,6 +30,7 @@ from app.schemas.document_type import DocumentTypeResponse
 from app.api.deps import get_current_user, get_author_or_above
 from app.services.audit import create_audit_log
 from app.services.document import create_document_from_wizard
+from app.services.pdf_export import pdf_generator
 
 router = APIRouter(prefix="/documents", tags=["Documents"])
 
@@ -339,3 +342,99 @@ async def submit_for_review(
     )
 
     return build_document_response(document)
+
+
+@router.get("/{document_id}/export/pdf")
+async def export_document_pdf(
+    document_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Export a document as PDF.
+
+    Generates a professional PDF document including:
+    - Document metadata (ID, version, status)
+    - All document content sections
+    - Approval signature blocks
+    - Company header and footer
+    """
+    # Get document with all relationships
+    query = select(Document).where(Document.id == document_id).options(
+        selectinload(Document.document_type),
+        selectinload(Document.versions),
+        selectinload(Document.owner)
+    )
+
+    result = await db.execute(query)
+    document = result.scalar_one_or_none()
+
+    if not document:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Document not found"
+        )
+
+    # Get current version content
+    current_version = None
+    version_number = "1.0"
+    content = {}
+
+    if document.versions:
+        for v in document.versions:
+            if v.is_current:
+                current_version = v
+                break
+        if not current_version:
+            current_version = document.versions[0]
+
+        version_number = f"{current_version.version_major}.{current_version.version_minor}"
+
+        if current_version.content:
+            try:
+                content = json.loads(current_version.content) if isinstance(current_version.content, str) else current_version.content
+            except json.JSONDecodeError:
+                content = {"content": current_version.content}
+
+    # Get owner name
+    owner_name = document.owner.name if document.owner else "Unknown"
+
+    # Get document type name
+    doc_type_name = document.document_type.name_de if document.document_type else "Dokument"
+
+    # Generate PDF
+    pdf_bytes = pdf_generator.generate_document_pdf(
+        document_id=document.document_id,
+        title=document.title,
+        document_type=doc_type_name,
+        department=document.department or "Allgemein",
+        version=version_number,
+        status=document.status.value,
+        owner=owner_name,
+        effective_date=document.effective_date,
+        review_date=document.next_review_date,
+        content=content,
+        created_at=document.created_at,
+    )
+
+    # Log the export
+    await create_audit_log(
+        db=db,
+        entity_type="Document",
+        entity_id=document.id,
+        action="export_pdf",
+        performed_by_id=current_user.id,
+        details={"version": version_number},
+        description=f"Document {document.document_id} exported as PDF"
+    )
+
+    # Create safe filename
+    safe_filename = f"{document.document_id}_{version_number}.pdf".replace(" ", "_").replace("/", "-")
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{safe_filename}"'
+        }
+    )
