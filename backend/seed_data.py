@@ -23,7 +23,7 @@ from app.models.product import Product, DosageForm, MarketStatus
 from app.models.document_type import DocumentType
 from app.models.template import Template
 from app.models.document import Document, DocumentStatus
-from app.models.document_version import DocumentVersion
+from app.models.document_version import DocumentVersion, VersionStatus
 from app.models.document_product_link import DocumentProductLink
 
 
@@ -787,11 +787,12 @@ async def seed_database():
             # Create version
             version = DocumentVersion(
                 document_id=doc.id,
-                version_number="1.0",
+                version_major=1,
+                version_minor=0,
                 content=json.dumps(doc_data["content"], ensure_ascii=False),
                 change_reason="Erstversion",
                 created_by_id=author_id,
-                is_current=True,
+                status=VersionStatus.EFFECTIVE if doc_data["status"] == DocumentStatus.EFFECTIVE else VersionStatus.DRAFT,
             )
             session.add(version)
 
