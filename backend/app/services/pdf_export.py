@@ -62,7 +62,7 @@ class PharmaPDFGenerator:
 
         # Body text style
         self.styles.add(ParagraphStyle(
-            name='BodyText',
+            name='DocBodyText',
             parent=self.styles['Normal'],
             fontSize=10,
             spaceAfter=6,
@@ -198,7 +198,7 @@ class PharmaPDFGenerator:
                                         if line.strip():
                                             story.append(Paragraph(
                                                 line.replace('<', '&lt;').replace('>', '&gt;'),
-                                                self.styles['BodyText']
+                                                self.styles['DocBodyText']
                                             ))
                     story.append(Spacer(1, 8))
 
